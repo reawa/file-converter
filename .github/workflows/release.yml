@@ -45,14 +45,17 @@ jobs:
           $repo = $env:GITHUB_REPOSITORY
           $tag = $env:GITHUB_REF_NAME
           $release = gh api "repos/$repo/releases/tags/$tag" | ConvertFrom-Json
-          $exe = $release.assets | Where-Object { $_.name -like "File Converter_*_x64-setup.exe" } | Select-Object -First 1
+          # Tauri replaces spaces in productName with dots in NSIS asset names.
+          $exe = $release.assets |
+            Where-Object { $_.name -like "*Converter*_x64-setup.exe" -and $_.name -notlike "*.sig" } |
+            Select-Object -First 1
           if (-not $exe) { throw "NSIS setup.exe asset not found on $tag" }
           $sigName = "$($exe.name).sig"
           $sigAsset = $release.assets | Where-Object { $_.name -eq $sigName } | Select-Object -First 1
           if (-not $sigAsset) { throw "Missing $sigName" }
           $sigPath = Join-Path $env:RUNNER_TEMP $sigName
           gh api "repos/$repo/releases/assets/$($sigAsset.id)" -H "Accept: application/octet-stream" > $sigPath
-          $sig = (Get-Content $sigPath -Raw).Trim()
+          $sig = [System.IO.File]::ReadAllText($sigPath).Trim()
           $version = $tag.TrimStart("v")
           $pubDate = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
           $json = @"
