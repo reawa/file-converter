@@ -1,6 +1,6 @@
 [package]
 name = "file-converter"
-version = "1.1.0"
+version = "1.1.1"
 description = "Desktop file converter for video, audio, and images using FFmpeg"
 authors = ["stardvn"]
 edition = "2021"
