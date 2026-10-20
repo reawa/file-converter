@@ -30,6 +30,8 @@ GitHub Actions secrets on `reawa/file-converter`:
 - `TAURI_SIGNING_PRIVATE_KEY` — contents of `file-converter.key`
 - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` — empty string if the key has no password
 
+NSIS assets are named with dots for spaces, e.g. `File.Converter_1.1.0_x64-setup.exe`.
+
 The workflow publishes the NSIS installer + `.sig`, then commits `updater/latest.json` on `main` for the private-repo endpoint:
 
 `https://raw.githubusercontent.com/reawa/file-converter/main/updater/latest.json`
