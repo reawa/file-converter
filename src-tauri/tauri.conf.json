@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "File Converter",
+  "mainBinaryName": "File Converter",
+  "version": "1.1.0",
+  "identifier": "com.stardvn.file-converter",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "npm run fetch-ffmpeg && npm run fetch-ytdlp && npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "File Converter",
+        "width": 720,
+        "height": 640,
+        "minWidth": 480,
+        "minHeight": 560,
+        "resizable": true,
+        "decorations": false,
+        "shadow": true,
+        "backgroundColor": "#0a0a0f"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "createUpdaterArtifacts": true,
+    "targets": ["nsis"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "binaries/win64/*": "ffmpeg/"
+    },
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "https://timestamp.digicert.com",
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "installerHooks": "windows/hooks.nsh"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVDOEU3MEUzMTI0OTNGQzYKUldUR1Awa1M0M0NPWEViOXJiOHFoVHRvUEtVNGV1c1V5R1VuLy9pSVFPaHpMV0xQdDVZWTlpQ0EK",
+      "endpoints": [
+        "https://raw.githubusercontent.com/reawa/file-converter/main/updater/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

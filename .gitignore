@@ -1,0 +1,39 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+test-assets
+*.local
+.env
+.env.*
+
+# Rust / Tauri build output
+src-tauri/target/
+
+# Bundled tool binaries (fetched by scripts/fetch-*.ps1 / beforeBuildCommand)
+src-tauri/binaries/
+
+# Local Cursor / editor
+.cursor/
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Signing / secrets (never commit)
+*.key
+*.pem
+update-token

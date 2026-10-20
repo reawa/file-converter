@@ -1,0 +1,28 @@
+[package]
+name = "file-converter"
+version = "1.1.0"
+description = "Desktop file converter for video, audio, and images using FFmpeg"
+authors = ["stardvn"]
+edition = "2021"
+default-run = "file-converter"
+
+[lib]
+name = "file_converter_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+uuid = { version = "1", features = ["v4"] }
+rayon = "1"
+clap = { version = "4.6.7", features = ["derive"] }
+ctrlc = "3.5.2"
+tauri-plugin-process = "2.4.0"
+tauri-plugin-updater = { version = "2.14.0", default-features = false, features = ["rustls-tls"] }
