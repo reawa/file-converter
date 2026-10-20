@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { confirm, open } from "@tauri-apps/plugin-dialog";
-import { openPath, revealItemInDir } from "@tauri-apps/plugin-opener";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { DropZone } from "./DropZone";
 import { FileList } from "./FileList";
@@ -48,9 +47,10 @@ function useUpdatePrompt(): {
   install: () => void;
   dismiss: () => void;
 } {
+  // Opt-in only: set localStorage file-converter.autoUpdate = "true" to install without a click.
   const auto =
-    typeof localStorage === "undefined" ||
-    localStorage.getItem(AUTO_UPDATE_KEY) !== "false";
+    typeof localStorage !== "undefined" &&
+    localStorage.getItem(AUTO_UPDATE_KEY) === "true";
   const [version, setVersion] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -522,7 +522,6 @@ export default function App() {
   async function revealOutputInExplorer(filePath: string) {
     try {
       await invoke("reveal_output_path", { path: filePath });
-      await revealItemInDir(filePath);
     } catch (e) {
       setConversionError(String(e));
     }
@@ -531,7 +530,6 @@ export default function App() {
   async function openOutputFile(filePath: string) {
     try {
       await invoke("open_output_path", { path: filePath });
-      await openPath(filePath);
     } catch (e) {
       setConversionError(String(e));
     }

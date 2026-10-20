@@ -17,7 +17,11 @@ static JS_RUNTIME: OnceLock<Option<(String, PathBuf)>> = OnceLock::new();
 pub fn init(app: &AppHandle) {
     let resource = app.path().resolve("ffmpeg", BaseDirectory::Resource).ok();
     init_with_dirs(resource.into_iter().collect());
-    spawn_self_update();
+    // Do not auto-run `yt-dlp -U` — that replaces a powerful binary outside the
+    // signed app updater. Use `fconv update-ytdlp` (or ship a new release) instead.
+    std::thread::spawn(|| {
+        let _ = detect_js_runtime();
+    });
 }
 
 /// CLI entry: no Tauri runtime, so look next to the running executable.
@@ -25,18 +29,11 @@ pub fn init_standalone() {
     init_with_dirs(crate::ffmpeg_tools::standalone_tool_dirs());
 }
 
-/// Keep extractor up to date — stale yt-dlp is a common cause of YouTube 403s.
+/// Explicit yt-dlp self-update (CLI only). Not invoked on GUI launch.
 pub fn self_update_blocking() {
     let _ = hidden_command(ytdlp_path())
         .args(["-U", "--no-warnings"])
         .output();
-}
-
-fn spawn_self_update() {
-    std::thread::spawn(|| {
-        self_update_blocking();
-        let _ = detect_js_runtime();
-    });
 }
 
 pub fn ytdlp_path() -> PathBuf {

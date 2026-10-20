@@ -5,7 +5,9 @@ use std::sync::{LazyLock, Mutex};
 use serde::{Deserialize, Serialize};
 
 use crate::ffmpeg_tools;
-use crate::hls::{effective_input_ext, is_hls_source, is_m3u8_url, media_input_path, PROTOCOL_WHITELIST};
+use crate::hls::{
+    effective_input_ext, is_hls_source, is_m3u8_url, media_input_path, protocol_whitelist_for,
+};
 use crate::process_utils::hidden_command;
 
 use crate::format_registry::{
@@ -52,7 +54,7 @@ pub fn probe_file(path: &str) -> Result<ProbeResult, String> {
 
     let mut cmd = hidden_command(ffmpeg_tools::ffprobe_path());
     if is_hls_source(path, &ext) {
-        cmd.args(["-protocol_whitelist", PROTOCOL_WHITELIST]);
+        cmd.args(["-protocol_whitelist", protocol_whitelist_for(path)]);
     }
     let input = media_input_path(path);
     cmd.args([

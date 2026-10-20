@@ -1,4 +1,3 @@
-import { invoke } from "@tauri-apps/api/core";
 import { check, type Update } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
@@ -14,26 +13,13 @@ export function isTauri(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
-async function authHeaders(): Promise<Record<string, string>> {
-  try {
-    const token = await invoke<string | null>("update_token");
-    if (!token) return {};
-    return {
-      Authorization: `token ${token}`,
-      Accept: "application/octet-stream",
-      "User-Agent": "File Converter",
-    };
-  } catch {
-    return {};
-  }
-}
-
 /** Check for a newer release. Keeps the update handle for {@link installPendingUpdate}. */
 export async function checkForUpdate(): Promise<UpdateCheckResult> {
   if (!isTauri()) return { kind: "skipped" };
   try {
-    const headers = await authHeaders();
-    const update = await check({ headers });
+    const update = await check({
+      headers: { "User-Agent": "File Converter" },
+    });
     if (!update) {
       pending = null;
       return { kind: "none" };

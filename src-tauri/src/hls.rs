@@ -4,7 +4,21 @@ use std::path::Path;
 
 use crate::format_registry::{is_supported_input, normalize_ext};
 
-pub const PROTOCOL_WHITELIST: &str = "file,http,https,tcp,tls,crypto";
+/// Local `.m3u8` files (and temp ranged playlists) may reference `file:` + http(s).
+pub const PROTOCOL_WHITELIST_LOCAL: &str = "file,http,https,tcp,tls,crypto";
+/// Remote playlists must not allow `file:` (hostile `#EXTINF` / map URIs).
+pub const PROTOCOL_WHITELIST_REMOTE: &str = "http,https,tcp,tls,crypto";
+/// Back-compat alias used by local HLS paths and older call sites.
+pub const PROTOCOL_WHITELIST: &str = PROTOCOL_WHITELIST_LOCAL;
+
+/// Protocol whitelist for ffmpeg/ffprobe based on whether the primary input is remote.
+pub fn protocol_whitelist_for(input: &str) -> &'static str {
+    if is_m3u8_url(input) {
+        PROTOCOL_WHITELIST_REMOTE
+    } else {
+        PROTOCOL_WHITELIST_LOCAL
+    }
+}
 
 const MAX_URL_LEN: usize = 4096;
 const SNIFF_BYTES: usize = 4096;
@@ -197,6 +211,21 @@ mod tests {
             output_stem_from_input("https://cdn.example.com/path/index-dvr.m3u8?token=1"),
             "index-dvr"
         );
+    }
+
+    #[test]
+    fn remote_playlist_whitelist_excludes_file() {
+        let remote = protocol_whitelist_for(
+            "https://cdn.example.com/vod/index-dvr.m3u8",
+        );
+        assert!(!remote.split(',').any(|p| p == "file"));
+        assert!(remote.contains("https"));
+    }
+
+    #[test]
+    fn local_playlist_whitelist_allows_file() {
+        let local = protocol_whitelist_for(r"C:\Users\me\Videos\stream.m3u8");
+        assert!(local.split(',').any(|p| p == "file"));
     }
 
     #[test]

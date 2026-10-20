@@ -543,12 +543,12 @@ pub fn get_default_output_dir() -> String {
 
 #[tauri::command]
 pub fn open_output_path(path: String) -> Result<(), String> {
-    validate_local_input_path(&path)?;
-    Ok(())
+    let p = validate_local_input_path(&path)?;
+    crate::process_utils::open_path_default(&p)
 }
 
 #[tauri::command]
 pub fn reveal_output_path(path: String) -> Result<(), String> {
-    validate_local_input_path(&path)?;
-    Ok(())
+    let p = validate_local_input_path(&path)?;
+    crate::process_utils::reveal_path_in_file_manager(&p)
 }

@@ -58,6 +58,7 @@ jobs:
           $sig = [System.IO.File]::ReadAllText($sigPath).Trim()
           $version = $tag.TrimStart("v")
           $pubDate = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+          $assetUrl = "https://github.com/$repo/releases/download/$tag/$($exe.name)"
           $json = @"
           {
             "version": "$version",
@@ -66,7 +67,7 @@ jobs:
             "platforms": {
               "windows-x86_64": {
                 "signature": "$sig",
-                "url": "https://api.github.com/repos/$repo/releases/assets/$($exe.id)"
+                "url": "$assetUrl"
               }
             }
           }
@@ -77,5 +78,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add updater/latest.json
-          git commit -m "Update private updater manifest for $tag" || echo "No manifest change"
+          git commit -m "Update updater manifest for $tag" || echo "No manifest change"
           git push origin HEAD:main

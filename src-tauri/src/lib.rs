@@ -12,7 +12,6 @@ mod queue;
 mod youtube;
 mod ytdlp_tools;
 
-use std::fs;
 use std::sync::Arc;
 
 use commands::{
@@ -22,23 +21,6 @@ use commands::{
     update_job_youtube_quality,
 };
 use queue::QueueState;
-use tauri::{AppHandle, Manager};
-
-/// Optional GitHub PAT for private-release updates (`%APPDATA%\com.stardvn.file-converter\update-token`).
-#[tauri::command]
-fn update_token(app: AppHandle) -> Result<Option<String>, String> {
-    let path = app
-        .path()
-        .app_config_dir()
-        .map_err(|e| e.to_string())?
-        .join("update-token");
-    if !path.is_file() {
-        return Ok(None);
-    }
-    let raw = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-    let token = raw.trim().to_string();
-    Ok(if token.is_empty() { None } else { Some(token) })
-}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -46,7 +28,6 @@ pub fn run() {
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
-        .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .manage(queue_state)
@@ -71,7 +52,6 @@ pub fn run() {
             get_default_output_dir,
             open_output_path,
             reveal_output_path,
-            update_token,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -8,7 +8,7 @@ Bump the same version in:
 - `src-tauri/Cargo.toml`
 - `src-tauri/tauri.conf.json`
 
-Tag as `vX.Y.Z` (example: `v1.1.0`) and push the tag to trigger `.github/workflows/release.yml`.
+Tag as `vX.Y.Z` (example: `v1.1.2`) and push the tag to trigger `.github/workflows/release.yml`.
 
 ## Updater signing (required for in-app updates)
 
@@ -30,19 +30,17 @@ GitHub Actions secrets on `reawa/file-converter`:
 - `TAURI_SIGNING_PRIVATE_KEY` — contents of `file-converter.key`
 - `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` — empty string if the key has no password
 
-NSIS assets are named with dots for spaces, e.g. `File.Converter_1.1.0_x64-setup.exe`.
+NSIS assets are named with dots for spaces, e.g. `File.Converter_1.1.2_x64-setup.exe`.
 
-The workflow publishes the NSIS installer + `.sig`, then commits `updater/latest.json` on `main` for the private-repo endpoint:
+The workflow publishes the NSIS installer + `.sig`, then commits `updater/latest.json` on `main` with a **public** release download URL:
+
+`https://github.com/reawa/file-converter/releases/download/<tag>/<asset>`
+
+Endpoint used by the app:
 
 `https://raw.githubusercontent.com/reawa/file-converter/main/updater/latest.json`
 
-### Private-repo update token (installed apps)
-
-While the GitHub repo is private, place a GitHub PAT (Contents read) at:
-
-`%APPDATA%\com.stardvn.file-converter\update-token`
-
-Example: `gh auth token` output, one line, no quotes. When the repo is public, switch asset URLs to public download links and remove the token requirement.
+In-app updates prompt by default (Update button). Opt-in silent install: set `localStorage` key `file-converter.autoUpdate` to `"true"`.
 
 ## Windows Authenticode (optional)
 
@@ -63,6 +61,16 @@ Add under `bundle.windows` in `tauri.conf.json`:
 ```json
 "signCommand": "signtool sign /fd sha256 /tr https://timestamp.digicert.com /td sha256 /a %1"
 ```
+
+## yt-dlp updates
+
+The GUI does **not** run `yt-dlp -U`. Ship a new app release, or run:
+
+```bash
+fconv update-ytdlp
+```
+
+YouTube downloads may fetch yt-dlp's EJS challenge solver from GitHub (`--remote-components ejs:github`) unless `FILE_CONVERTER_YTDLP_REMOTE_EJS=0`.
 
 ## FFmpeg / yt-dlp compliance
 

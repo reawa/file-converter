@@ -5,7 +5,7 @@ use crate::process_utils::hidden_command;
 use crate::format_registry::{
     is_lossless_extension, normalize_ext, output_category, ConversionTier, MediaCategory,
 };
-use crate::hls::{is_hls_source, is_m3u8_url, media_input_path, PROTOCOL_WHITELIST};
+use crate::hls::{is_hls_source, is_m3u8_url, media_input_path, protocol_whitelist_for};
 use crate::probe::ProbeResult;
 
 static ENCODER_CAPS: OnceLock<EncoderCaps> = OnceLock::new();
@@ -131,7 +131,7 @@ pub fn build_ffmpeg_args(
 
     if hls {
         args.push("-protocol_whitelist".to_string());
-        args.push(PROTOCOL_WHITELIST.to_string());
+        args.push(protocol_whitelist_for(input).to_string());
         // HTTP reconnect options only apply when the primary input is http(s).
         // Ranged jobs use a local temp .m3u8; passing -reconnect there makes
         // ffmpeg exit with "Option not found".
