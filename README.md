@@ -14,17 +14,17 @@ Use it only on media you own or have permission to process. This project is not 
 - yt-dlp downloads for supported media links (bundled on Windows releases)
 - Absolute start/end range for HLS downloads
 - CLI (`fconv`) installed next to the app and added to your user PATH
-- In-app updates from signed GitHub releases
+- Signed in-app updates (prompt + one-click Install)
 
 ## Install (Windows)
 
-1. Download the latest `File Converter_*_x64-setup.exe` from [Releases](https://github.com/reawa/file-converter/releases).
+1. Download the latest `File.Converter_*_x64-setup.exe` from [Releases](https://github.com/reawa/file-converter/releases).
 2. Run the installer (current-user install under `%LOCALAPPDATA%\File Converter`).
 3. Open **File Converter** from the Start menu.
 
 The CLI is available as `fconv` after opening a new terminal (PATH entry: `%LOCALAPPDATA%\File Converter\cli`).
 
-Installers are updater-signed. They may still show a SmartScreen warning until an Authenticode certificate is added — see [docs/RELEASE.md](docs/RELEASE.md).
+Installers are updater-signed (minisign). They may still show a SmartScreen warning until an Authenticode certificate is added — see [docs/RELEASE.md](docs/RELEASE.md).
 
 ## CLI
 
@@ -36,9 +36,17 @@ fconv check
 fconv update-ytdlp
 ```
 
+## Privacy and trust notes
+
+- Pasted `http(s)` links are fetched by this PC (via FFmpeg or yt-dlp). Do not paste untrusted URLs.
+- Remote HLS playlists cannot use `file:` URIs. Local playlists still can.
+- The app updater is signature-verified. The GUI does **not** auto-run `yt-dlp -U`; use `fconv update-ytdlp` or install a new release.
+- YouTube downloads may pull yt-dlp’s EJS challenge solver from GitHub. Disable with `FILE_CONVERTER_YTDLP_REMOTE_EJS=0` (YouTube may then fail).
+- Updates show a prompt by default. Silent auto-install: set `localStorage` `file-converter.autoUpdate` to `"true"`.
+
 ## Requirements
 
-**End users (installer):** Windows x64. FFmpeg and yt-dlp are bundled.
+**End users (installer):** Windows x64. FFmpeg and yt-dlp are bundled. YouTube links need Node.js or Deno on PATH.
 
 **Development**
 

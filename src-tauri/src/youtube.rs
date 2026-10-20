@@ -11,16 +11,32 @@ use crate::ytdlp_tools;
 const MAX_URL_LEN: usize = 4096;
 
 /// Append yt-dlp flags needed for modern YouTube (JS challenge + retries).
+///
+/// YouTube's JS challenge solver (`ejs`) is only enabled when
+/// `FILE_CONVERTER_YTDLP_REMOTE_EJS` is unset or not `0`/`false`. Set it to `0`
+/// to block yt-dlp from fetching remote challenge code (YouTube may then fail).
 fn push_youtube_compat_args(args: &mut Vec<String>) -> Result<(), String> {
     let (runtime, path) = ytdlp_tools::require_js_runtime_for_youtube()?;
     args.push("--js-runtimes".into());
     // Explicit path so GUI-spawned processes still find Node/Deno.
     args.push(format!("{runtime}:{}", path.to_string_lossy().replace('\\', "/")));
-    args.push("--remote-components".into());
-    args.push("ejs:github".into());
+    if remote_ejs_allowed() {
+        args.push("--remote-components".into());
+        args.push("ejs:github".into());
+    }
     args.push("--retries".into());
     args.push("5".into());
     Ok(())
+}
+
+fn remote_ejs_allowed() -> bool {
+    match std::env::var("FILE_CONVERTER_YTDLP_REMOTE_EJS") {
+        Ok(v) => {
+            let lower = v.trim().to_ascii_lowercase();
+            !(lower == "0" || lower == "false" || lower == "off" || lower == "no")
+        }
+        Err(_) => true,
+    }
 }
 
 static META_CACHE: LazyLock<Mutex<HashMap<String, YouTubeMeta>>> =
