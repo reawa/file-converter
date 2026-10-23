@@ -1,5 +1,6 @@
 pub mod cli;
 mod commands;
+mod tray;
 mod converter;
 mod ffmpeg_tools;
 mod format_registry;
@@ -14,6 +15,8 @@ mod ytdlp_tools;
 
 use std::sync::Arc;
 
+use tauri::Manager;
+
 use commands::{
     cancel_conversion, check_ffmpeg, check_output_conflicts, get_default_output_dir,
     get_output_format_groups, get_output_formats, get_supported_extensions, open_output_path,
@@ -27,6 +30,9 @@ pub fn run() {
     let queue_state = Arc::new(QueueState::new());
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            tray::show_main(app);
+        }))
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -35,6 +41,8 @@ pub fn run() {
             ffmpeg_tools::init(app.handle());
             ytdlp_tools::init(app.handle());
             crate::converter::init_encoder_cache_background();
+            app.manage(tray::TrayPrefs::load(app.handle()));
+            tray::install(app.handle())?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

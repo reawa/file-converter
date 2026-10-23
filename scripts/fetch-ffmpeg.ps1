@@ -1,5 +1,8 @@
 # Fetches FFmpeg (LGPL shared build) for Windows x64 into src-tauri/binaries/win64.
-# Source: https://github.com/BtbN/FFmpeg-Builds (ffmpeg-master-latest-win64-lgpl-shared.zip)
+# Pinned BtbN autobuild (do not use the moving "latest" tag).
+# N-125365-g9a01c1cb6a — autobuild-2026-06-30-13-34
+# The on-disk daily N-125146-20260621 is no longer published; existing local
+# binaries are kept until this folder is deleted.
 
 $ErrorActionPreference = "Stop"
 
@@ -12,7 +15,7 @@ if ((Test-Path $ffmpegExe) -and (Test-Path $ffprobeExe)) {
     exit 0
 }
 
-$url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-lgpl-shared.zip"
+$url = "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2026-06-30-13-34/ffmpeg-N-125365-g9a01c1cb6a-win64-lgpl-shared.zip"
 $zip = Join-Path $env:TEMP "ffmpeg-win64-lgpl-shared.zip"
 $extractRoot = Join-Path $env:TEMP "ffmpeg-lgpl-shared-extract"
 

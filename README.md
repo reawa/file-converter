@@ -10,11 +10,33 @@ Use it only on media you own or have permission to process. This project is not 
 - Automatic **COPY** (stream copy, no quality loss) when codecs allow it
 - **ENCODE HQ** near-lossless presets when re-encoding is required
 - Batch queue with per-file progress, elapsed time, and ETA
-- Drag-and-drop, file picker, or paste an `http(s)` media / HLS (`.m3u8`) link
-- yt-dlp downloads for supported media links (bundled on Windows releases)
-- Absolute start/end range for HLS downloads
+- Drag-and-drop or file picker
 - CLI (`fconv`) installed next to the app and added to your user PATH
 - Signed in-app updates (prompt + one-click Install)
+- Close hides to the tray. Right-click the tray icon to turn **Close to tray** off, or choose Quit
+
+### Downloads
+
+Paste a link only for media you have the right to save.
+
+- **HLS:** any `http` or `https` `.m3u8` playlist, with an optional start and end
+- **Other links:** any other `http` or `https` URL that [yt-dlp](https://github.com/yt-dlp/yt-dlp) supports, including YouTube and Twitch
+
+YouTube downloads may fetch yt-dlp’s EJS challenge solver. Set `FILE_CONVERTER_YTDLP_REMOTE_EJS=0` to turn that off (YouTube may then fail).
+
+### Re-encode
+
+Examples: PNG to JPG, MOV to MP4, a video to MP3.
+
+**Video in:** mp4, mkv, webm, avi, mov, ts, flv, m4v, wmv, mpeg, mpg, 3gp, m3u8  
+**Video out:** mp4, mkv, webm, avi, mov, ts, gif  
+**Audio extract from video:** mp3, wav, flac, aac, ogg, m4a
+
+**Audio in:** mp3, wav, flac, aac, ogg, m4a, wma, opus, aiff  
+**Audio out:** mp3, wav, flac, aac, ogg, m4a
+
+**Image in:** jpg, jpeg, png, webp, gif, bmp, tiff, tif, ico, avif, jxl  
+**Image out:** jpg, png, webp, gif, bmp, tiff, ico, avif (jxl is input only)
 
 ## Install (Windows)
 

@@ -559,7 +559,7 @@ mod tests {
     #[ignore]
     fn hls_range_smoke() {
         use crate::process_utils::hidden_command;
-        use crate::hls::PROTOCOL_WHITELIST;
+        use crate::hls::PROTOCOL_WHITELIST_LOCAL;
 
         let url = "https://d2vi6trrdongqn.cloudfront.net/577fbb474357ba645435_shinyatheninja_320129887838_1788783599/chunked/index-dvr.m3u8";
         let range = HlsRange {
@@ -576,7 +576,7 @@ mod tests {
         let out = std::env::temp_dir().join(format!("fc-hls-smoke-{}.mp4", uuid::Uuid::new_v4()));
         let status = hidden_command(bin.join("ffmpeg.exe"))
             .args([
-                "-y", "-protocol_whitelist", PROTOCOL_WHITELIST, "-fflags", "+genpts",
+                "-y", "-protocol_whitelist", PROTOCOL_WHITELIST_LOCAL, "-fflags", "+genpts",
                 "-i", &input, "-c", "copy", "-avoid_negative_ts", "make_zero",
                 "-bsf:a", "aac_adtstoasc", "-movflags", "+faststart",
                 out.to_str().unwrap(),

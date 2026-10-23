@@ -8,8 +8,6 @@ use crate::format_registry::{is_supported_input, normalize_ext};
 pub const PROTOCOL_WHITELIST_LOCAL: &str = "file,http,https,tcp,tls,crypto";
 /// Remote playlists must not allow `file:` (hostile `#EXTINF` / map URIs).
 pub const PROTOCOL_WHITELIST_REMOTE: &str = "http,https,tcp,tls,crypto";
-/// Back-compat alias used by local HLS paths and older call sites.
-pub const PROTOCOL_WHITELIST: &str = PROTOCOL_WHITELIST_LOCAL;
 
 /// Protocol whitelist for ffmpeg/ffprobe based on whether the primary input is remote.
 pub fn protocol_whitelist_for(input: &str) -> &'static str {
