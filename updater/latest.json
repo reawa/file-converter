@@ -1,11 +1,11 @@
 {
-  "version": "1.1.2",
-  "notes": "File Converter 1.1.2",
-  "pub_date": "2026-10-20T19:21:56Z",
+  "version": "1.1.3",
+  "notes": "File Converter 1.1.3",
+  "pub_date": "2026-10-23T10:47:23Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUR1Awa1M0M0NPWEgvV3ZpSnhRSUZPNnBSVjRjcE5tTlZZS2pXODNVNFF1V1VabndQZ2s2SDRvU2U3SmxhSUFVR29IWmIxS3REeUdLa1VqTzAxblJqUWhYUkh5U2V1anc4PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNTI0MDc3CWZpbGU6RmlsZSBDb252ZXJ0ZXJfMS4xLjJfeDY0LXNldHVwLmV4ZQp1NDdKOGNpYVBxejk1MWtHSmVUcUpZWHlNY2QzaDUwS1Z2b25VVzRXMmtydWJUTEE1QXJEdU1tK3o4VWt2Z1Q1THlHVXhld1hNUVBpcDdxM1RoUXBDdz09Cg==",
-      "url": "https://github.com/reawa/file-converter/releases/download/v1.1.2/File.Converter_1.1.2_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUR1Awa1M0M0NPWEs0MS9SMVNzK3paN1BhQmswNHlMMU04WVZnZlVSbDRNVXA0ZzBLYTkxa1A1VzU3azhzSlZwbUZMenlmZFc4K1kzVkZSMzJnUkY2TzhWZ1RhTk1xT3c0PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkyNzUyNDMyCWZpbGU6RmlsZSBDb252ZXJ0ZXJfMS4xLjNfeDY0LXNldHVwLmV4ZQpJaFRCTi9JaVJldm9IQzIyYXZmMUZSZWdBT0c4dDdaUlk5STRUR2RkazN6ZW5iWTZuSHV0UVBsK3NQcm85TjR2ZHpGMmF3NzdwUHdFOGpaTU0xdmRCdz09Cg==",
+      "url": "https://github.com/reawa/file-converter/releases/download/v1.1.3/File.Converter_1.1.3_x64-setup.exe"
     }
   }
 }
