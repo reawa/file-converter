@@ -259,7 +259,13 @@ export default function App() {
       setFiles((prev) =>
         prev.map((f) =>
           f.id === e.payload.id
-            ? { ...f, status: e.payload.message, error: e.payload.message, timing: undefined }
+            ? {
+                ...f,
+                status: e.payload.message,
+                error: e.payload.message,
+                progress: 0,
+                timing: undefined,
+              }
             : f
         )
       );

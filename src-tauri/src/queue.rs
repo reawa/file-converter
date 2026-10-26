@@ -339,6 +339,54 @@ fn parse_time(text: &str) -> Option<f64> {
     Some(h * 3600.0 + m * 60.0 + s)
 }
 
+/// FFmpeg's closing per-output summary, not a failure. Newer builds prefix the muxer:
+/// `[out#0/mp4 @ 000002794f731680] video:2038633KiB audio:79330KiB subtitle:0KiB ...`
+fn is_ffmpeg_mux_stats(line: &str) -> bool {
+    let trimmed = line.trim();
+    let body = trimmed
+        .rsplit_once("] ")
+        .map(|(_, rest)| rest)
+        .unwrap_or(trimmed);
+    let lower = body.to_ascii_lowercase();
+    lower.starts_with("video:")
+        && lower.contains("audio:")
+        && (lower.contains("kib") || lower.contains("kb") || lower.contains("mib") || lower.contains("mb"))
+}
+
+fn is_ffmpeg_progress_line(line: &str) -> bool {
+    let trimmed = line.trim_start();
+    trimmed.starts_with("frame=") || trimmed.starts_with("size=") || is_ffmpeg_mux_stats(trimmed)
+}
+
+/// Last useful stderr line. Skip the generic closer and the mux size summary so a real
+/// cause (HTTP, demux, encoder) is not hidden behind `video:…KiB audio:…KiB`.
+fn ffmpeg_failure_detail(tail: &[String]) -> String {
+    let useful: Vec<&str> = tail
+        .iter()
+        .map(|line| line.trim())
+        .filter(|line| !line.is_empty() && *line != "Conversion failed!" && !is_ffmpeg_mux_stats(line))
+        .collect();
+
+    let errorish = useful.iter().rev().find(|line| {
+        let lower = line.to_ascii_lowercase();
+        lower.contains("error")
+            || lower.contains("failed")
+            || lower.contains("invalid")
+            || lower.contains("unable")
+            || lower.contains("not found")
+            || lower.contains("forbidden")
+            || lower.contains("timed out")
+            || lower.contains("no such")
+            || lower.contains("denied")
+    });
+
+    errorish
+        .copied()
+        .or_else(|| useful.last().copied())
+        .unwrap_or("FFmpeg exited with an error.")
+        .to_string()
+}
+
 fn run_ffmpeg(
     rep: &JobReporter,
     program: &str,
@@ -374,7 +422,7 @@ fn run_ffmpeg(
                 break;
             }
 
-            let is_stats = line.starts_with("frame=") || line.starts_with("size=");
+            let is_stats = is_ffmpeg_progress_line(&line);
             if !is_stats && !line.trim().is_empty() {
                 stderr_tail.push(line.clone());
                 if stderr_tail.len() > 12 {
@@ -841,14 +889,9 @@ fn process_job(
         // no stderr captured but failed — still report
     }
 
-    // FFmpeg ends most failures with a generic "Conversion failed!"; report the cause instead.
-    let detail = stderr_tail
-        .iter()
-        .rev()
-        .map(|l| l.trim())
-        .find(|l| !l.is_empty() && *l != "Conversion failed!")
-        .map(str::to_string)
-        .unwrap_or_else(|| "FFmpeg exited with an error.".to_string());
+    // FFmpeg ends most failures with a generic "Conversion failed!" plus a size summary.
+    // Report the cause instead of `[out#0/mp4] video:…KiB audio:…KiB`.
+    let detail = ffmpeg_failure_detail(&stderr_tail);
     let _ = fs::remove_file(&out_path);
     rep.error(detail);
 
@@ -938,6 +981,41 @@ pub fn resolve_output_paths(
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn failure_detail_skips_mux_size_summary() {
+        let tail = vec![
+            "[hls @ 000001] Failed to open segment 12 of playlist".to_string(),
+            "[out#0/mp4 @ 000002794f731680] video:2038633KiB audio:79330KiB subtitle:0KiB other streams:0KiB global headers:0KiB muxing overhead: 0.012%".to_string(),
+            "Conversion failed!".to_string(),
+        ];
+        assert_eq!(
+            ffmpeg_failure_detail(&tail),
+            "[hls @ 000001] Failed to open segment 12 of playlist"
+        );
+    }
+
+    #[test]
+    fn failure_detail_prefers_error_over_later_info() {
+        let tail = vec![
+            "Error opening input: Server returned 403 Forbidden".to_string(),
+            "[https @ 000001] Opening 'https://cdn.example/seg.ts' for reading".to_string(),
+            "video:12kB audio:1kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown".to_string(),
+        ];
+        assert_eq!(
+            ffmpeg_failure_detail(&tail),
+            "Error opening input: Server returned 403 Forbidden"
+        );
+    }
+
+    #[test]
+    fn failure_detail_falls_back_when_only_stats_remain() {
+        let tail = vec![
+            "[out#0/mp4 @ 000002794f731680] video:2038633KiB audio:79330KiB subtitle:0KiB".to_string(),
+            "Conversion failed!".to_string(),
+        ];
+        assert_eq!(ffmpeg_failure_detail(&tail), "FFmpeg exited with an error.");
+    }
 
     #[test]
     fn splits_ffmpeg_stats_on_carriage_return() {
